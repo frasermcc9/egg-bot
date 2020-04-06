@@ -49,7 +49,7 @@ client.on('error', console.error);
 client.login(auth.token);
 
 client.on('message', async msg => {
-    if (probability(1)) {
+    if (probability(0.05)) {
         let egg = getEgg()
         msg.react(egg.emote).then(() => {
 
