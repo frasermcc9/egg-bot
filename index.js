@@ -4,7 +4,7 @@ const path = require('path');
 const auth = require('./auth.json');
 
 const client = new CommandoClient({
-    commandPrefix: auth.prefix,
+    commandPrefix: "$",
     owner: '202917897176219648'
 });
 
@@ -20,6 +20,12 @@ class User extends Model { }
 User.init({
     disId: DataTypes.STRING,
     points: DataTypes.INTEGER,
+    egg1: DataTypes.INTEGER,
+    egg2: DataTypes.INTEGER,
+    egg3: DataTypes.INTEGER,
+    egg4: DataTypes.INTEGER,
+    egg5: DataTypes.INTEGER,
+    egg6: DataTypes.INTEGER,
 }, { sequelize, modelName: 'user' });
 
 client.registry
@@ -54,22 +60,21 @@ client.on('message', async msg => {
             const collector = new ReactionCollector(msg, filter, { time: 1000 * 15 })
             collector.on('collect', () => {
                 collector.stop()
-                msg.reactions.removeAll()
             })
 
             collector.on('end', collected => {
-                let user = Array.from(collected.first().users.cache)[1]
-
-                sequelize.sync().then(() => User.findOrCreate({ where: { disId: user[0] }, defaults: { points: 0 } })).spread(function (tag, created) {
-                    if (created) {
-                        User.increment({ points: egg.score }, {
-                            where: { disId: user[0] }
+                msg.reactions.removeAll()
+                if (collected.size != 0) {
+                    let user = Array.from(collected.first().users.cache)[1]
+                    sequelize.sync().then(() => User.findOrCreate({ where: { disId: user[0] }, defaults: { points: 0, egg1: 0, egg2: 0, egg3: 0, egg4: 0, egg5: 0, egg6: 0 } })).then(() => {
+                        User.findOne({ where: { disId: user[0] } }).then(tag => {
+                            tag.increment({ points: egg.score }).then(() => {
+                                tag.increment(`${egg.eggName}`, { by: 1 })
+                            })
                         })
-                    } else {
-                        tag.increment({ points: egg.score })
-                    }
+                    })
                     return msg.channel.send(`Congrats ${user[1].username}, you collected a tier ${egg.tier} egg worth ${egg.score} points!`)
-                })
+                }
             })
         })
     }
@@ -102,6 +107,7 @@ class Egg {
         this.tier = tier
         this.score = score
         this.emote = client.emojis.cache.find(emoji => emoji.id === emoteId);
+        this.eggName = "egg" + tier
     }
 }
 
