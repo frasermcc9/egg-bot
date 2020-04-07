@@ -49,7 +49,7 @@ client.on('error', console.error);
 client.login(auth.token);
 
 client.on('message', async msg => {
-    if (probability(0.05)) {
+    if (probability(1)) {
         let egg = getEgg()
         msg.react(egg.emote).then(() => {
 
@@ -82,25 +82,39 @@ client.on('message', async msg => {
 
 function getEgg() {
     let val = (Math.random())
-    if (val > 0 && val <= 0.3) {
+    if (val > 0 && val <= 0.25) {
         return new Egg(1, 5, "696547527364968499")
-    }
-    else if (val > .3 && val <= .55) {
+    } else if (val > .25 && val <= .47) {
         return new Egg(2, 10, "696547528065155072")
-    }
-    else if (val > .55 && val <= .75) {
+    } else if (val > .47 && val <= .65) {
         return new Egg(3, 15, "696547526957858818")
-    }
-    else if (val > .75 && val <= .9) {
+    } else if (val > .65 && val <= .77) {
         return new Egg(4, 25, "696547527243202580")
-    }
-    else if (val > .9 && val <= .98) {
+    } else if (val > .77 && val <= .85) {
         return new Egg(5, 50, "696547528472002661")
+    } else if (val > .85 && val <= .89) {
+        return new Egg(6, 50, "696547527222099969")
+    } else if (val > .89 && val <= .96) {
+        return new Egg(-1, -10, "696927180726206564")
     } else {
-        return new Egg(6, 75, "696547527222099969")
+        return new Egg(-2, -100, "696927181443563550")
     }
-
 }
+
+class Egg {
+    constructor(tier, score, emoteId) {
+        this.tier = tier
+        this.score = score
+        this.emote = client.emojis.cache.find(emoji => emoji.id === emoteId);
+        this.eggName = "egg" + tier
+    }
+}
+
+function probability(probValue) {
+    return Math.random() < probValue
+}
+
+
 
 class Egg {
     constructor(tier, score, emoteId) {
